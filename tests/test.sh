@@ -1,0 +1,1 @@
+./gcd --machine-readable
