@@ -10,7 +10,7 @@ LEVEL = ../..
 #
 TOOLNAME = kmonkey
 
-LINK_COMPONENTS = cbackend
+LINK_COMPONENTS = linker asmparser bitwriter
 
 #
 # List libraries that we'll need
@@ -18,8 +18,11 @@ LINK_COMPONENTS = cbackend
 #
 USEDLIBS = kmonkey.a
 
+NO_PEDANTIC = 1
+
 #
 # Include Makefile.common so we know what to do.
 #
 include $(LEVEL)/Makefile.common
 
+LIBS += -lgsl -lblas

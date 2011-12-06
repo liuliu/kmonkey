@@ -10,6 +10,8 @@ LEVEL = ../..
 #
 LIBRARYNAME = kmonkey
 
+NO_PEDANTIC = 1
+
 #
 # Include Makefile.common so we know what to do.
 #

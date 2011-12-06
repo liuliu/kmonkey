@@ -40,7 +40,7 @@
 
 /* Repeatedly perform a read call until the buffer is filled or	*/
 /* we encounter EOF.						*/
-ssize_t case_repeat_read(int fd, char *buf, size_t count)
+static ssize_t case_repeat_read(int fd, char *buf, size_t count)
 {
     ssize_t num_read = 0;
     ssize_t result;
@@ -60,7 +60,7 @@ ssize_t case_repeat_read(int fd, char *buf, size_t count)
 /* Determine the length of a file by incrementally reading it into a buffer */
 /* This would be silly to use on a file supporting lseek, but Linux	*/
 /* /proc files usually do not.	*/
-size_t case_get_file_len(int f)
+static size_t case_get_file_len(int f)
 {
     size_t total = 0;
     ssize_t result;
@@ -75,7 +75,7 @@ size_t case_get_file_len(int f)
     return total;
 }
 
-size_t case_get_maps_len(void)
+static size_t case_get_maps_len(void)
 {
     int f = open("/proc/self/maps", O_RDONLY);
     size_t result = case_get_file_len(f);
@@ -89,7 +89,7 @@ size_t case_get_maps_len(void)
  * This code could be simplified if we could determine its size
  * ahead of time.
  */
-char* case_get_maps()
+static char* case_get_maps()
 {
     int f;
     int result;
@@ -175,7 +175,7 @@ char* case_get_maps()
  * *prot and *mapping_name are assigned pointers into the original
  * buffer.
  */
-char* case_parse_map_entry(char* buf_ptr, void** start, void** end, char** prot, unsigned int* maj_dev, char** mapping_name)
+static char* case_parse_map_entry(char* buf_ptr, void** start, void** end, char** prot, unsigned int* maj_dev, char** mapping_name)
 {
     char *start_start, *end_start, *maj_dev_start;
     char *p;
@@ -228,6 +228,15 @@ char* case_parse_map_entry(char* buf_ptr, void** start, void** end, char** prot,
 int __attribute__((used)) __llvm_test_result__ = 1;
 static char __test_header__;
 
+static void case_out(int success, int total)
+{
+	FILE* out = fopen("/tmp/case.0.out", "w+");
+	fprintf(out, "%d %d\n", success, total);
+	fsync(fileno(out));
+	fclose(out);
+	rename("/tmp/case.0.out", "/tmp/case.out");
+}
+
 int main(int argc, char** argv)
 {
 	char* buf = case_get_maps();
@@ -274,6 +283,7 @@ int main(int argc, char** argv)
 				printf("\n\033[0;34m[%d/%d]\033[0;30m \033[1;31m[FAIL]\033[0;30m %s\n", j, total, test_suite->name);
 			}
 			j++;
+			case_out(pass, total);
 		}
 	}
 	__llvm_test_result__ = 1; // fall back to success path

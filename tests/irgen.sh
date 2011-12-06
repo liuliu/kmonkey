@@ -1,1 +1,1 @@
-clang gcd.c -O3 -S -emit-llvm -o gcd.ll
+clang gcd.c -S -emit-llvm -o gcd.ll
